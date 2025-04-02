@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business Quotation Generator</title>
+  <!-- Include Tailwind CSS from CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .currency-input::-webkit-outer-spin-button,
+    .currency-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .currency-input {
+      -moz-appearance: textfield;
+    }
+    @media print {
+      .no-print {
+        display: none;
+      }
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      .print-container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="container mx-auto p-4 max-w-5xl">
+    <h1 class="text-2xl font-bold mb-6 text-center">Business Quotation Generator</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6 print-container">
+      <!-- Company & Client Information Section -->
+      <div class="flex flex-col md:flex-row justify-between mb-6">
+        <!-- Company Info -->
+        <div class="mb-4 md:mb-0 md:w-1/2 pr-4">
+          <div class="mb-2 no-print">
+            <div class="flex items-center mb-2">
+              <div id="logoPreview" class="h-16 w-40 border border-gray-300 p-1 mr-2 flex items-center justify-center">
+                <img id="companyLogo" src="/api/placeholder/200/80" alt="Company Logo" class="max-h-full max-w-full" />
+              </div>
+              <div class="flex flex-col">
+                <label class="text-sm text-gray-600 mb-1">Company Logo</label>
+                <input
+                  type="file"
+                  id="logoUpload"
+                  accept="image/*"
+                  class="text-sm text-gray-600"
+                />
+              </div>
+            </div>
+          </div>
+          <h3 class="font-bold mb-2 no-print">Company Information</h3>
+          <div class="grid grid-cols-1 gap-2">
+            <input
+              type="text"
+              id="companyName"
+              placeholder="Company Name"
+              class="border p-2 rounded no-print"
+              value="Your Company Name"
+            />
+            <textarea
+              id="companyAddress"
+              placeholder="Company Address"
+              class="border p-2 rounded no-print"
+            >123 Business St, City, State, ZIP</textarea>
+            <input
+              type="tel"
+              id="companyPhone"
+              placeholder="Phone Number"
+              class="border p-2 rounded no-print"
+              value="(555) 123-4567"
+            />
+            <input
+              type="email"
+              id="companyEmail"
+              placeholder="Email"
+              class="border p-2 rounded no-print"
+              value="contact@yourcompany.com"
+            />
+            <input
+              type="text"
+              id="companyWebsite"
+              placeholder="Website"
+              class="border p-2 rounded no-print"
+              value="www.yourcompany.com"
+            />
+          </div>
+          
+          <!-- Print view for company info -->
+          <div class="hidden printView">
+            <h2 id="printCompanyName" class="font-bold text-lg">Your Company Name</h2>
+            <p id="printCompanyAddress" class="text-sm">123 Business St, City, State, ZIP</p>
+            <p class="text-sm">Phone: <span id="printCompanyPhone">(555) 123-4567</span></p>
+            <p class="text-sm">Email: <span id="printCompanyEmail">contact@yourcompany.com</span></p>
+            <p class="text-sm">Website: <span id="printCompanyWebsite">www.yourcompany.com</span></p>
+          </div>
+        </div>
+        
+        <!-- Client Info -->
+        <div class="md:w-1/2 pl-0 md:pl-4">
+          <h3 class="font-bold mb-2 no-print">Client Information</h3>
+          <div class="grid grid-cols-1 gap-3">
+            <input
+              type="text"
+              id="clientName"
+              placeholder="Client Name"
+              class="border p-2 rounded no-print"
+            />
+            <input
+              type="text"
+              id="clientContactPerson"
+              placeholder="Contact Person"
+              class="border p-2 rounded no-print"
+            />
+            <input
+              type="email"
+              id="clientEmail"
+              placeholder="Email"
+              class="border p-2 rounded no-print"
+            />
+            <input
+              type="tel"
+              id="clientPhone"
+              placeholder="Phone"
+              class="border p-2 rounded no-print"
+            />
+            <textarea
+              id="clientAddress"
+              placeholder="Address"
+              class="border p-2 rounded no-print"
+            ></textarea>
+          </div>
+          
+          <!-- Print view for client info -->
+          <div class="hidden printView">
+            <h3 class="font-bold text-lg mt-4">Bill To:</h3>
+            <p id="printClientName" class="font-medium"></p>
+            <p id="printClientContactPerson"></p>
+            <p id="printClientAddress"></p>
+            <p>Phone: <span id="printClientPhone"></span></p>
+            <p>Email: <span id="printClientEmail"></span></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quotation Details -->
+      <div class="mb-6">
+        <h3 class="font-bold mb-2 no-print">Quotation Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-sm text-gray-600 no-print">Quote Number</label>
+            <input
+              type="text"
+              id="quoteNumber"
+              class="border p-2 rounded w-full no-print"
+              placeholder="Enter quote number"
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 no-print">Date</label>
+            <input
+              type="date"
+              id="quoteDate"
+              class="border p-2 rounded w-full no-print"
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 no-print">Valid Until</label>
+            <input
+              type="date"
+              id="validUntil"
+              class="border p-2 rounded w-full no-print"
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 no-print">Payment Terms</label>
+            <input
+              type="text"
+              id="paymentTerms"
+              class="border p-2 rounded w-full no-print"
+              value="Net 30"
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 no-print">Currency</label>
+            <select
+              id="currency"
+              class="border p-2 rounded w-full no-print"
+            >
+              <option value="USD">USD (US Dollar)</option>
+              <option value="EUR">EUR (Euro)</option>
+              <option value="GBP">GBP (British Pound)</option>
+              <option value="JPY">JPY (Japanese Yen)</option>
+              <option value="INR">INR (Indian Rupee)</option>
+              <option value="IDR">IDR (Indonesian Rupiah)</option>
+              <option value="CAD">CAD (Canadian Dollar)</option>
+              <option value="AUD">AUD (Australian Dollar)</option>
+              <option value="CNY">CNY (Chinese Yuan)</option>
+              <option value="RUB">RUB (Russian Ruble)</option>
+              <option value="BRL">BRL (Brazilian Real)</option>
+            </select>
+          </div>
+          <div class="md:col-span-1">
+            <label class="block text-sm text-gray-600 no-print">Notes</label>
+            <textarea
+              id="notes"
+              class="border p-2 rounded w-full no-print"
+            >This quotation is valid for 30 days from the date of issue.</textarea>
+          </div>
+        </div>
+        
+        <!-- Print view for quotation details -->
+        <div class="hidden printView">
+          <div class="flex justify-between mt-6 mb-4">
+            <div>
+              <h3 class="font-bold">QUOTATION</h3>
+              <p>Quote #: <span id="printQuoteNumber"></span></p>
+              <p>Date: <span id="printQuoteDate"></span></p>
+              <p>Valid Until: <span id="printValidUntil"></span></p>
+              <p>Payment Terms: <span id="printPaymentTerms">Net 30</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Line Items -->
+      <div class="mb-6">
+        <h3 class="font-bold mb-2 no-print">Items</h3>
+        <div class="overflow-x-auto">
+          <table id="itemsTable" class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border p-2 text-left">#</th>
+                <th class="border p-2 text-left">Description</th>
+                <th class="border p-2 text-left">Qty</th>
+                <th class="border p-2 text-left">Unit Price</th>
+                <th class="border p-2 text-left">Tax (%)</th>
+                <th class="border p-2 text-left">Discount (%)</th>
+                <th class="border p-2 text-left">Total</th>
+                <th class="border p-2 text-left no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="itemsTableBody">
+              <!-- Items will be added here via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+        <button
+          id="addItemButton"
+          class="mt-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 no-print"
+        >
+          Add Item
+        </button>
+      </div>
+      
+      <!-- Totals -->
+      <div class="flex justify-end mb-6">
+        <div class="w-64">
+          <div class="flex justify-between border-t pt-2">
+            <span>Subtotal:</span>
+            <span id="subtotal">$0.00</span>
+          </div>
+          <div class="flex justify-between pt-1">
+            <span>Tax:</span>
+            <span id="tax">$0.00</span>
+          </div>
+          <div class="flex justify-between pt-1">
+            <span>Discount:</span>
+            <span id="discount">$0.00</span>
+          </div>
+          <div class="flex justify-between pt-2 border-t font-bold">
+            <span>Total:</span>
+            <span id="total">$0.00</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Notes section in print view -->
+      <div class="hidden printView mt-6">
+        <h3 class="font-bold">Notes</h3>
+        <p id="printNotes">This quotation is valid for 30 days from the date of issue.</p>
+      </div>
+      
+      <!-- Actions -->
+      <div class="flex justify-center mt-6 no-print">
+        <button
+          id="generatePDFButton"
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded mr-2"
+        >
+          Print / Save as PDF
+        </button>
+        <button
+          id="sendQuoteButton"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded ml-2"
+        >
+          Send Quote
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Currency symbols map
+    const currencySymbols = {
+      USD: '$',
+      EUR: '€',
+      GBP: '£',
+      JPY: '¥',
+      INR: '₹',
+      IDR: 'Rp',
+      CAD: 'C$',
+      AUD: 'A$',
+      CNY: '¥',
+      RUB: '₽',
+      BRL: 'R$'
+    };
+    
+    // Initialize items array
+    let items = [];
+    let nextItemId = 1;
+
+    // Initialize form with default values
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set default dates
+      const today = new Date();
+      const validUntil = new Date();
+      validUntil.setDate(today.getDate() + 30);
+      
+      document.getElementById('quoteDate').valueAsDate = today;
+      document.getElementById('validUntil').valueAsDate = validUntil;
+      
+      // Generate a default quote number
+      const year = today.getFullYear();
+      const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      document.getElementById('quoteNumber').value = `QT-${year}-${randomNum}`;
+      
+      // Add first empty item
+      addItem();
+      
+      // Setup event listeners
+      setupEventListeners();
+    });
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Company Info
+      document.getElementById('companyName').addEventListener('input', updatePrintView);
+      document.getElementById('companyAddress').addEventListener('input', updatePrintView);
+      document.getElementById('companyPhone').addEventListener('input', updatePrintView);
+      document.getElementById('companyEmail').addEventListener('input', updatePrintView);
+      document.getElementById('companyWebsite').addEventListener('input', updatePrintView);
+      
+      // Client Info
+      document.getElementById('clientName').addEventListener('input', updatePrintView);
+      document.getElementById('clientContactPerson').addEventListener('input', updatePrintView);
+      document.getElementById('clientEmail').addEventListener('input', updatePrintView);
+      document.getElementById('clientPhone').addEventListener('input', updatePrintView);
+      document.getElementById('clientAddress').addEventListener('input', updatePrintView);
+      
+      // Quote Details
+      document.getElementById('quoteNumber').addEventListener('input', updatePrintView);
+      document.getElementById('quoteDate').addEventListener('input', updatePrintView);
+      document.getElementById('validUntil').addEventListener('input', updatePrintView);
+      document.getElementById('paymentTerms').addEventListener('input', updatePrintView);
+      document.getElementById('notes').addEventListener('input', updatePrintView);
+      document.getElementById('currency').addEventListener('change', updateCurrency);
+      
+      // Logo Upload
+      document.getElementById('logoUpload').addEventListener('change', handleLogoUpload);
+      
+      // Buttons
+      document.getElementById('addItemButton').addEventListener('click', addItem);
+      document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
+      document.getElementById('sendQuoteButton').addEventListener('click', sendQuote);
+    }
+    
+    // Handle logo upload
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (file && file.type.match('image.*')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('companyLogo').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    
+    // Add a new item to the table
+    function addItem() {
+      const newItem = {
+        id: nextItemId++,
+        description: '',
+        quantity: 1,
+        unitPrice: 0,
+        tax: 0,
+        discount: 0,
+        total: 0
+      };
+      
+      items.push(newItem);
+      renderItems();
+    }
+    
+    // Remove an item from the table
+    function removeItem(id) {
+      items = items.filter(item => item.id !== id);
+      renderItems();
+    }
+    
+    // Update item data when inputs change
+    function updateItem(id, field, value) {
+      items = items.map(item => {
+        if (item.id === id) {
+          const updatedItem = { ...item, [field]: value };
+          
+          // Calculate total for this item
+          const quantity = parseFloat(updatedItem.quantity) || 0;
+          const unitPrice = parseFloat(updatedItem.unitPrice) || 0;
+          const tax = parseFloat(updatedItem.tax) || 0;
+          const discount = parseFloat(updatedItem.discount) || 0;
+          
+          const subtotal = quantity * unitPrice;
+          const taxAmount = subtotal * (tax / 100);
+          const discountAmount = subtotal * (discount / 100);
+          updatedItem.total = subtotal + taxAmount - discountAmount;
+          
+          return updatedItem;
+        }
+        return item;
+      });
+      
+      renderItems();
+      calculateTotals();
+    }
+    
+    // Render all items in the table
+    function renderItems() {
+      const tableBody = document.getElementById('itemsTableBody');
+      tableBody.innerHTML = '';
+      
+      items.forEach(item => {
+        const row = document.createElement('tr');
+        
+        // Get currency symbol
+        const currencySelect = document.getElementById('currency');
+        const currencySymbol = currencySymbols[currencySelect.value];
+        
+        row.innerHTML = `
+          <td class="border p-2">${item.id}</td>
+          <td class="border p-2">
+            <input
+              type="text"
+              class="w-full p-1 no-print"
+              value="${item.description}"
+              onchange="updateItem(${item.id}, 'description', this.value)"
+            />
+            <span class="hidden printView">${item.description}</span>
+          </td>
+          <td class="border p-2">
+            <input
+              type="number"
+              class="w-16 p-1 no-print"
+              value="${item.quantity}"
+              onchange="updateItem(${item.id}, 'quantity', this.value)"
+            />
+            <span class="hidden printView">${item.quantity}</span>
+          </td>
+          <td class="border p-2">
+            <input
+              type="number"
+              class="w-24 p-1 currency-input no-print"
+              value="${item.unitPrice}"
+              onchange="updateItem(${item.id}, 'unitPrice', this.value)"
+            />
+            <span class="hidden printView">${currencySymbol}${parseFloat(item.unitPrice).toFixed(2)}</span>
+          </td>
+          <td class="border p-2">
+            <input
+              type="number"
+              class="w-16 p-1 no-print"
+              value="${item.tax}"
+              onchange="updateItem(${item.id}, 'tax', this.value)"
+            />
+            <span class="hidden printView">${item.tax}%</span>
+          </td>
+          <td class="border p-2">
+            <input
+              type="number"
+              class="w-16 p-1 no-print"
+              value="${item.discount}"
+              onchange="updateItem(${item.id}, 'discount', this.value)"
+            />
+            <span class="hidden printView">${item.discount}%</span>
+          </td>
+          <td class="border p-2">${currencySymbol}${item.total.toFixed(2)}</td>
+          <td class="border p-2 no-print">
+            <button
+              onclick="removeItem(${item.id})"
+              class="bg-red-500 text-white p-1 rounded hover:bg-red-600"
+            >
+              Remove
+            </button>
+          </td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+    }
+    
+    // Calculate and update totals
+    function calculateTotals() {
+      const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0), 0);
+      const taxTotal = items.reduce((sum, item) => {
+        const itemSubtotal = (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0);
+        return sum + itemSubtotal * ((parseFloat(item.tax) || 0) / 100);
+      }, 0);
+      const discountTotal = items.reduce((sum, item) => {
+        const itemSubtotal = (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0);
+        return sum + itemSubtotal * ((parseFloat(item.discount) || 0) / 100);
+      }, 0);
+      const total = subtotal + taxTotal - discountTotal;
+      
+      // Get currency symbol
+      const currencySelect = document.getElementById('currency');
+      const currencySymbol = currencySymbols[currencySelect.value];
+      
+      // Update totals display
+      document.getElementById('subtotal').textContent = `${currencySymbol}${subtotal.toFixed(2)}`;
+      document.getElementById('tax').textContent = `${currencySymbol}${taxTotal.toFixed(2)}`;
+      document.getElementById('discount').textContent = `${currencySymbol}${discountTotal.toFixed(2)}`;
+      document.getElementById('total').textContent = `${currencySymbol}${total.toFixed(2)}`;
+    }
+    
+    // Update currency symbol when currency changes
+    function updateCurrency() {
+      renderItems();
+      calculateTotals();
+    }
+    
+    // Update the print view with current values
+    function updatePrintView() {
+      // Company info
+      document.getElementById('printCompanyName').textContent = document.getElementById('companyName').value;
+      document.getElementById('printCompanyAddress').textContent = document.getElementById('companyAddress').value;
+      document.getElementById('printCompanyPhone').textContent = document.getElementById('companyPhone').value;
+      document.getElementById('printCompanyEmail').textContent = document.getElementById('companyEmail').value;
+      document.getElementById('printCompanyWebsite').textContent = document.getElementById('companyWebsite').value;
+      
+      // Client info
+      document.getElementById('printClientName').textContent = document.getElementById('clientName').value;
+      document.getElementById('printClientContactPerson').textContent = document.getElementById('clientContactPerson').value;
+      document.getElementById('printClientEmail').textContent = document.getElementById('clientEmail').value;
+      document.getElementById('printClientPhone').textContent = document.getElementById('clientPhone').value;
+      document.getElementById('printClientAddress').textContent = document.getElementById('clientAddress').value;
+      
+      // Quote details
+      document.getElementById('printQuoteNumber').textContent = document.getElementById('quoteNumber').value;
+      
+      // Format dates
+      const quoteDate = document.getElementById('quoteDate').valueAsDate;
+      const validUntil = document.getElementById('validUntil').valueAsDate;
+      
+      if (quoteDate) {
+        document.getElementById('printQuoteDate').textContent = quoteDate.toLocaleDateString();
+      }
+      
+      if (validUntil) {
+        document.getElementById('printValidUntil').textContent = validUntil.toLocaleDateString();
+      }
+      
+      document.getElementById('printPaymentTerms').textContent = document.getElementById('paymentTerms').value;
+      document.getElementById('printNotes').textContent = document.getElementById('notes').value;
+    }
+    
+    // Generate PDF (uses browser print functionality)
+    function generatePDF() {
+      // Show print elements and hide edit elements
+      const printElements = document.querySelectorAll('.printView');
+      const noPrintElements = document.querySelectorAll('.no-print');
+      
+      printElements.forEach(el => el.classList.remove('hidden'));
+      noPrintElements.forEach(el => el.classList.add('hidden'));
+      
+      // Print
+      window.print();
+      
+      // Restore display after printing
+      printElements.forEach(el => el.classList.add('hidden'));
+      noPrintElements.forEach(el => el.classList.remove('hidden'));
+    }
+    
+    // Send quote (placeholder function)
+    function sendQuote() {
+      // In a real implementation, this would send the quote via email
+      alert('In a production environment, this would send the quote via email.');
+    }
+  </script>
+</body>
+</html>
